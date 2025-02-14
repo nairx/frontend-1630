@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+      function validate() {
+        let user = document.getElementById("username").value;
+        let pass = document.getElementById("password").value;
+        const userinfo = {
+          username: user,
+          password: pass
+        };
+        fetch("http://localhost:8000/api-token-auth/", {
+          Method: "POST",
+          Headers: {
+            Accept: "application.json",
+            "Content-Type": "application/json",
+          },
+          Body: userinfo,
+          Cache: "default",
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Login Form</h1>
+    <p><input type="text" id="username" /></p>
+    <p><input type="password" id="password" /></p>
+    <button onclick="validate()">Log In</button>
+    <hr />
+    <div id="data"></div>
+  </body>
+</html>
