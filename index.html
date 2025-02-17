@@ -4,33 +4,72 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
     <script>
+      let userToken = "";
       function validate() {
         let user = document.getElementById("username").value;
         let pass = document.getElementById("password").value;
         const userinfo = {
           username: user,
-          password: pass
+          password: pass,
         };
         fetch("http://localhost:8000/api-token-auth/", {
-          Method: "POST",
-          Headers: {
-            Accept: "application.json",
+          method: "POST",
+          headers: {
             "Content-Type": "application/json",
           },
-          Body: userinfo,
-          Cache: "default",
-        });
+          body: JSON.stringify(userinfo),
+        })
+          .then((response) => response.json())
+          .then((data) => (userToken = data.token))
+          .then(() => fetchProducts())
+          .catch((error) => (root.innerHTML = error));
       }
+      function showLogin() {
+        let str = `
+        <h1>Login Form</h1>
+        <p><input type="text" id="username" /></p>
+        <p><input type="password" id="password" /></p>
+        <button onclick="validate()">Log In</button>
+        <div id="msg"></div>
+      `;
+        root.innerHTML = str;
+      }
+      const fetchProducts = () => {
+        fetch("http://localhost:8000/api/products/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${userToken}`,
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => showProducts(data))
+          .catch((error) => (msg.innerHTML = "Access Denied"));
+      };
+      const showProducts = (data) => {
+        let str = "<div class='row'>";
+        data &&
+          data.map((value) => {
+            str += `
+            <div class='box'>
+                <img src='${value.url}'>
+                <h1>${value.name}</h1>
+                <p>${value.desc}</p>
+                <h3>$${value.price}
+            </div>
+                `;
+          });
+        root.innerHTML = str + "</div>";
+      };
     </script>
   </head>
-  <body>
-    <h1>Login Form</h1>
-    <p><input type="text" id="username" /></p>
-    <p><input type="password" id="password" /></p>
-    <button onclick="validate()">Log In</button>
-    <hr />
-    <div id="data"></div>
+  <body onload="showLogin()">
+    <h1>My Store</h1>
+    <hr>
+    <div id="root"></div>
+    <hr>
+    <h4>@Copyright 2025. All rights reserved.</h4>
   </body>
 </html>
