@@ -48,6 +48,53 @@
           .then((data) => showProducts(data))
           .catch((error) => (msg.innerHTML = "Access Denied"));
       };
+
+      const deleteProduct = (id) => {
+        fetch(`http://localhost:8000/api/products/${id}/`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${userToken}`,
+          },
+        })
+          .then(() => fetchProducts())
+          .catch((error) => (msg.innerHTML = "Access Denied"));
+      };
+
+      const addProduct = () => {
+        let name = document.getElementById("name").value;
+        let desc = document.getElementById("desc").value;
+        let price = document.getElementById("price").value;
+        let url = document.getElementById("url").value;
+        const prodInfo = {
+          name: name,
+          price: price,
+          desc: desc,
+          url: url,
+        };
+        fetch("http://localhost:8000/api/products/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(prodInfo),
+        })
+          .then(() => fetchProducts())
+          .catch((error) => (root.innerHTML = error));
+      };
+
+      const showForm = () => {
+        let str = `
+        <h2>Add Products</h2>
+        <p><input type='text' id='name' placeholder='Product Name'></p>
+         <p><input type='text' id='desc' placeholder='Product Description'></p>
+          <p><input type='text' id='price' placeholder='Product Price'></p>
+           <p><input type='text' id='url' placeholder='Product URL'></p>
+           <button onclick='addProduct()'>Add</button>
+        `;
+        root.innerHTML = str;
+      };
+
       const showProducts = (data) => {
         let str = "<div class='row'>";
         data &&
@@ -57,7 +104,8 @@
                 <img src='${value.url}'>
                 <h1>${value.name}</h1>
                 <p>${value.desc}</p>
-                <h3>$${value.price}
+                <h3>$${value.price}</h3>
+                <button onclick='deleteProduct(${value.id})'>Delete</button>
             </div>
                 `;
           });
@@ -67,9 +115,10 @@
   </head>
   <body onload="showLogin()">
     <h1>My Store</h1>
-    <hr>
+    <h3 onclick="showForm()">Add Product</h3>
+    <hr />
     <div id="root"></div>
-    <hr>
+    <hr />
     <h4>@Copyright 2025. All rights reserved.</h4>
   </body>
 </html>
